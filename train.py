@@ -5,8 +5,9 @@ import random
 from utils import reader, init_weights
 from model import Discriminator
 from model import Generator
-from Dataset import Dataset
+from Data import Dataset
 import torch.backends.cudnn as cudnn
+import torch 
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--save_dir", help="Save Directory for weights")
@@ -22,9 +23,10 @@ cudnn.benchmark = True
 
 argsDict = reader(args.yml)
 
-data = Dataset(args.dataset, transform = True, argsDict['image_size'])
+data = Dataset.Dataset(args.dataset, argsDict['image_size'], True)
+print(data)
 
-dataloader = torch.utils.data.DataLoader(dataset, batch_size = argsDict['batch_size'], shuffle = True, pin_memory=True)
+dataloader = torch.utils.data.DataLoader(data, batch_size = argsDict['batch_size'], shuffle = True, pin_memory=True)
 device = torch.device("cuda:0" if args.cuda else "cpu")
 
 #Build model
@@ -44,4 +46,15 @@ for epoch in range(argsDict['epochs']):
         fake_label = torch.full((batch_size, 1), 0, device=device, dtype=torch.float32)
 
         lossDict = model(realA, realB, real_label, fake_label)
+
+        progress_bar.set_description(
+            f"[{epoch}/{argsDict['epochs']-1}][{i}/{len(dataloader) - 1}]"
+            f"Discriminator Loss: {lossDict['disc_loss'].item():.4f}"
+            f"Generator Loss: {lossDict['gen_loss'].item():.4f}"
+            f"Identity Loss: {lossDict['gen_identity_loss'].item():.4f}"
+            f"GAN Loss: {lossDict['GAN_loss'].item():.4f}"
+            f"Cycle Loss: {lossDict['cycle_loss'].item():.4f}"
+        )
+
+        #TODO Implement functionality to save images after every epoch
 

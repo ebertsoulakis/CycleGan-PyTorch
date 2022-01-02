@@ -1,15 +1,19 @@
 from torch.utils.data import Dataset
 import torchvision.transforms as transforms
+import glob
+import os
 
 from PIL import Image
 
 class Dataset(Dataset):
-    def __init__(self, root, transform=True, image_size):
+    def __init__(self, root, image_size, transform=True):
         self.transform = transform
         self.image_size = image_size
-
-        self.A = sorted(glob.glob(os.path.join(root, "train/A") + "/*.*"))
-        self.B = sorted(glob.glob(os.path.join(root, "train/B") + "/*.*"))
+        print(os.path.join(root, "trainA"))
+        self.A = sorted(glob.glob(os.path.join(root, "trainA")))
+        self.B = sorted(glob.glob(os.path.join(root, "trainB") + "/*.*"))
+        print(self.A)
+        print(self.B)
 
     def __getitem__(self, index):
         if self.transform:
