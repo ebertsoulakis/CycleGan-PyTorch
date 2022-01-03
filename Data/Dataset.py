@@ -9,11 +9,9 @@ class Dataset(Dataset):
     def __init__(self, root, image_size, transform=True):
         self.transform = transform
         self.image_size = image_size
-        print(os.path.join(root, "trainA"))
-        self.A = sorted(glob.glob(os.path.join(root, "trainA")))
+        
+        self.A = sorted(glob.glob(os.path.join(root, "trainA") + "/*.*"))
         self.B = sorted(glob.glob(os.path.join(root, "trainB") + "/*.*"))
-        print(self.A)
-        print(self.B)
 
     def __getitem__(self, index):
         if self.transform:
