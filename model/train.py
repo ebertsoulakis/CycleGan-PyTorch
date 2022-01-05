@@ -1,11 +1,13 @@
 import argparse
 import os
 import random
+from tqdm import tqdm
 
 from utils import reader, init_weights
-from model import Discriminator
-from model import Generator
-from Data import Dataset
+from Discriminator import Discriminator
+from Generator import Generator
+from Dataset import Dataset
+from CycleGan import CycleGAN
 import torch.backends.cudnn as cudnn
 import torch 
 
@@ -23,15 +25,16 @@ cudnn.benchmark = True
 
 argsDict = reader(args.yml)
 
-data = Dataset.Dataset(args.dataset, argsDict['image_size'], True)
-print(data)
+data = Dataset(args.dataset, argsDict['image_size'], True)
 
 dataloader = torch.utils.data.DataLoader(data, batch_size = argsDict['batch_size'], shuffle = True, pin_memory=True)
 device = torch.device("cuda:0" if args.cuda else "cpu")
+train = True
+eval = False
 
 #Build model
-model = CycleGAN(argsDict)
-if pretrain != None and os.path.isdir(pretrain) == True:
+model = CycleGAN(9, train, eval, argsDict, device)
+if args.pretrain != None and os.path.isdir(args.pretrain) == True:
     #TODO Implement loading pretrain checkpoints
     print("t")
 

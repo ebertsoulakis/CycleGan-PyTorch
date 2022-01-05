@@ -1,4 +1,6 @@
 import yaml
+import torch
+import random
 
 def reader(ymlFile):
     with open(ymlFile) as file:
@@ -9,9 +11,9 @@ def reader(ymlFile):
 def init_weights(m):
     name = m.__class__.__name__
     if name.find('Conv') != -1:
-        torch.nn.init.normal_(m.weights, 0.0, 0.02)
+        torch.nn.init.normal_(m.weight, 0.0, 0.02)
     
-    elif classname.find("BatchNorm") != -1:
+    elif name.find("BatchNorm") != -1:
         torch.nn.init.normal_(m.weight, 1.0, 0.02)
         torch.nn.init.zeros_(m.bias)
 

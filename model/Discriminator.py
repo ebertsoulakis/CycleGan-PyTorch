@@ -7,7 +7,7 @@ class Discriminator(nn.Module):
         super(Discriminator, self).__init__()
         
         self.body = nn.Sequential(
-            nn.Conv2d(3, 64, 64, stride=2, padding=1),
+            nn.Conv2d(3, 64, 4, stride=2, padding=1),
             nn.LeakyReLU(0.2, inplace=True),
 
             nn.Conv2d(64, 128, 4, stride=2, padding=1),
@@ -18,8 +18,8 @@ class Discriminator(nn.Module):
             nn.InstanceNorm2d(256),
             nn.LeakyReLU(0.2, inplace=True),
 
-            nn.Conv2d(128, 256, 4, stride=2, padding=1),
-            nn.InstanceNorm2d(256),
+            nn.Conv2d(256, 512, 4, stride=2, padding=1),
+            nn.InstanceNorm2d(512),
             nn.LeakyReLU(0.2, inplace=True),
 
             nn.Conv2d(512, 1, 4, padding=1)

@@ -25,13 +25,14 @@ class Dataset(Dataset):
 
 
 
-def transforms(img, image_size):
+def transform_img(img, image_size):
 
     #Define transforms
-    img_transforms = transforms.compose([
-        transforms.Resize(int(image_size), Image.BICUBIC),
+    img_transforms = transforms.Compose([
+        transforms.Resize(int(image_size*1.12), Image.BICUBIC),
         transforms.RandomCrop(image_size),
         transforms.RandomHorizontalFlip(),
+        transforms.ToTensor(),
         transforms.Normalize((0.5,0.5,0.5), (0.5,0.5,0.5))
     ])
 

@@ -1,15 +1,17 @@
 import torch
 import torch.nn as nn
+import itertools
 
-from Utils import ReplayBuffer
+from utils import ReplayBuffer, init_weights
 from Generator import Generator
 from Discriminator import Discriminator
 
 class CycleGAN(nn.Module):
-    def __init__(self, n_c, train, eval, argsDict):
-        super(CycleGAN, self).__init__():
+    def __init__(self, n_c, train, eval, argsDict, device):
+        super(CycleGAN, self).__init__()
         self.n_c = n_c
         self.argsDict = argsDict
+        self.device = device
 
         if train == True:
             self.train = True
@@ -19,11 +21,11 @@ class CycleGAN(nn.Module):
             self.train = False
             self.eval = True
 
-        self.gen_AB = Generator(self.n_c).to(device)
-        self.gen_BA = Generator(self.n_c).to(device)
+        self.gen_AB = Generator(self.n_c).to(self.device)
+        self.gen_BA = Generator(self.n_c).to(self.device)
 
-        self.disc_A = Discriminator().to(device)
-        self.disc_B = Discriminator().to(device)
+        self.disc_A = Discriminator().to(self.device)
+        self.disc_B = Discriminator().to(self.device)
 
         self.gen_AB.apply(init_weights)
         self.gen_BA.apply(init_weights)
@@ -33,12 +35,12 @@ class CycleGAN(nn.Module):
 
         self.cycle_loss = torch.nn.L1Loss().to(device)
         self.identity_loss = torch.nn.L1Loss().to(device)
-        self.adversial_loss = torch.nn.MSELoss.to(device)
+        self.adversial_loss = torch.nn.MSELoss().to(device)
 
-        self.optimizer_G = torch.optim.Adam(itertools.chain(gen_AB.parameters(), gen_BA.parameters()),
+        self.optimizer_G = torch.optim.Adam(itertools.chain(self.gen_AB.parameters(), self.gen_BA.parameters()),
                                lr=self.argsDict['lr'], betas=(0.5, 0.999))
-        self.optimizer_D_A = torch.optim.Adam(disc_A.parameters(), lr=self.argsDict['lr'], betas=(0.5, 0.999))
-        self.optimizer_D_B = torch.optim.Adam(disc_B.parameters(), lr=self.argsDict['lr'], betas=(0.5, 0.999))
+        self.optimizer_D_A = torch.optim.Adam(self.disc_A.parameters(), lr=self.argsDict['lr'], betas=(0.5, 0.999))
+        self.optimizer_D_B = torch.optim.Adam(self.disc_B.parameters(), lr=self.argsDict['lr'], betas=(0.5, 0.999))
 
         self.fake_A_buffer = ReplayBuffer()
         self.fake_B_buffer = ReplayBuffer()
@@ -49,68 +51,68 @@ class CycleGAN(nn.Module):
         self.optimizer_G.zero_grad()
 
         #Identity loss
-        identity_A = self.genBA(r_A)
+        identity_A = self.gen_BA(r_A)
         loss_identity_A = self.identity_loss(identity_A, r_A) * 5.0
 
-        identity_B = self.genAB(r_B)
+        identity_B = self.gen_AB(r_B)
         loss_identity_B = self.identity_loss(identity_B, r_B) * 5.0
 
         #GAN loss
-        fake_A = self.genBA(r_B)
-        fake_out_A = self.discA(fake_A)
-        loss_GAN_BA = self.adversial_loss(fake_out_A, real_label)
+        fake_A = self.gen_BA(r_B)
+        fake_out_A = self.disc_A(fake_A)
+        loss_GAN_BA = self.adversial_loss(fake_out_A, realL)
 
-        fake_B = self.genAB(r_A)
+        fake_B = self.gen_AB(r_A)
         fake_out_B = self.disc_B(fake_B)
-        loss_GAN_AB = self.adversial_loss(fake_out_B, real_label)
+        loss_GAN_AB = self.adversial_loss(fake_out_B, realL)
 
         #Cycle loss
-        recov_A = =self.gen_BA(fake_B)
-        loss_cycle_ABA = self.cycle_loss(recov_A, realA) * 10.0
+        recov_A = self.gen_BA(fake_B)
+        loss_cycle_ABA = self.cycle_loss(recov_A, r_A) * 10.0
 
-        recov_B = self.genAB(fake_A)
-        loss_cycle_BAB = self.cycle_loss(recov_B, realB) * 10.0
+        recov_B = self.gen_AB(fake_A)
+        loss_cycle_BAB = self.cycle_loss(recov_B, r_B) * 10.0
 
-        total_error = loss_identity_A + loss_identity_B + loss_GAN_A2B + loss_GAN_B2A + loss_cycle_ABA + loss_cycle_BAB
+        total_error = loss_identity_A + loss_identity_B + loss_GAN_AB + loss_GAN_BA + loss_cycle_ABA + loss_cycle_BAB
 
         total_error.backward()
-        optimizer_G.step()
+        self.optimizer_G.step()
 
         #Step 2: Update Discriminator A
-        optimizer_D_A.zero_grad()
+        self.optimizer_D_A.zero_grad()
 
-        real_out_A = disc_A(realA)
-        real_A_err = self.adversial_loss(real_out_A, realA)
+        real_out_A = self.disc_A(r_A)
+        real_A_err = self.adversial_loss(real_out_A, r_A)
 
-        fake_im_A = self.fake_A_buf.push_and_pop(fake_A)
+        fake_im_A = self.fake_A_buffer.push_and_pop(fake_A)
         fake_out_A = self.disc_A(fake_im_A.detach())
-        fake_A_err = self.adversial_loss(fake_out_A, fake_label)
+        fake_A_err = self.adversial_loss(fake_out_A, fakeL)
 
         err_disc_A = (real_A_err + fake_A_err) / 2
 
         err_disc_A.backward()
 
-        optimizer_D_A.step()
+        self.optimizer_D_A.step()
 
         #Step 3: Discriminator B
-        optimizer_D_B.zero_grad()
+        self.optimizer_D_B.zero_grad()
 
-        real_out_B = disc_A(realB)
-        real_B_err = self.adversial_loss(real_out_B, realB)
+        real_out_B = self.disc_A(r_B)
+        real_B_err = self.adversial_loss(real_out_B, r_B)
 
-        fake_im_B = self.fake_B_buf.push_and_pop(fake_B)
+        fake_im_B = self.fake_B_buffer.push_and_pop(fake_B)
         fake_out_B = self.disc_B(fake_im_B.detach())
-        fake_B_err = self.adversial_loss(fake_out_B, fake_label)
+        fake_B_err = self.adversial_loss(fake_out_B, fakeL)
 
         err_disc_B = (real_B_err + fake_B_err) / 2
 
         err_disc_B.backward()
 
-        optimizer_D_B.step()
+        self.optimizer_D_B.step()
 
         lossDict = {
             'disc_loss': err_disc_A + err_disc_B,
-            'gen_loss': total_loss,
+            'gen_loss': total_error,
             'gen_identity_loss': loss_identity_A + loss_identity_B,
             'GAN_loss': loss_GAN_BA + loss_GAN_AB,
             'cycle_loss': loss_cycle_ABA + loss_cycle_BAB
