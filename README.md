@@ -46,7 +46,7 @@ conda install pytorch torchvision torchaudio cudatoolkit=10.2 -c pytorch
 Currently, only training with one dataset is possible with this repository. An exampel training command is shown below
 
 ```
-python train.py --yml ../CycleGan.yml --dataset ../../horse2zebra/ --cuda
+python train.py --yml ../CycleGan.yml --dataset ../../horse2zebra/ --cuda --train
 ```
 
 Hyperparameters can be changed in CycleGan.yml using an text editor.
