@@ -31,7 +31,7 @@ git clone https://github.com/ebertsoulakis/CycleGan-PyTorch.git
 cd CycleGan-Pytorch
 ```
 
-This implementation was created using PyTorcg which can be install using the following pip command
+This implementation was created using PyTorch which can be install using the following pip command
 ```
 pip3 install torch torchvision torchaudio
 ```
