@@ -33,7 +33,6 @@ device = torch.device("cuda:0" if args.cuda else "cpu")
 #Build model
 model = CycleGAN(9, args.train, args.eval, argsDict, device)
 if args.pretrain != None:
-    #TODO Implement loading pretrain checkpoints
     CycleGAN.load_state_dict(torch.load(args.pretrain))
 
 #Create save directory
@@ -63,7 +62,5 @@ for epoch in range(argsDict['epochs']):
             f" GAN Loss: {lossDict['GAN_loss'].item():.4f}"
             f" Cycle Loss: {lossDict['cycle_loss'].item():.4f}"
         )
-
-        #TODO Implement functionality to save images after every epoch
 
     torch.save(model.state_dict(), f"{args.save_dir}/weights/cyclegan_epoch_{epoch}.pth")
