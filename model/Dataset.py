@@ -14,9 +14,15 @@ class Dataset(Dataset):
         self.B = sorted(glob.glob(os.path.join(root, "trainB") + "/*.*"))
 
     def __getitem__(self, index):
+
+        ImageA = Image.open(self.A[index % len(self.A)])
+        ImageA = ImageA.convert('RGB')
+        ImageB = Image.open(self.B[index % len(self.B)])
+        ImageB = ImageB.convert('RGB')
+        
         if self.transform:
-            fileA = transform_img(Image.open(self.A[index % len(self.A)]), self.image_size)
-            fileB = transform_img(Image.open(self.B[index % len(self.B)]), self.image_size)
+            fileA = transform_img(ImageA, self.image_size)
+            fileB = transform_img(ImageB, self.image_size)
 
         return {"A": fileA, "B": fileB}
 
