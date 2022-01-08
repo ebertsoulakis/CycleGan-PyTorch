@@ -43,18 +43,23 @@ conda install pytorch torchvision torchaudio cudatoolkit=10.2 -c pytorch
 
 ## Usage
 
-Currently, only training with one dataset is possible with this repository. An exampel training command is shown below
+Currently, only training with one dataset is possible with this repository. An example training command is shown below
 
 ```
-python train.py --yml ../CycleGan.yml --dataset ../../horse2zebra/ --cuda --train
+python train.py --yml /path/to/yml --dataset /path/to/dataset --cuda --train --save_dir /path/to/save/dir
 ```
 
 Hyperparameters can be changed in CycleGan.yml using an text editor.
 
+To finetune on a pretrained checkpoint, set the 'pretrain' command as shown below
+
+```
+python train.py --yml /path/to/yml --dataset /path/to/dataset --cuda --train --save_dir /path/to/save/dir --pretrain /path/to/checkpoint/
+```
+
 ## TODO
 
 1. Add inference script
-2. Allow for finetuning
-3. Add support for different datasets
+2. Add support for different datasets
 
 
