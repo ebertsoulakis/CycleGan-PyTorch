@@ -71,7 +71,7 @@ Currently, only training is possible with this repository. An example training c
 python train.py --yml /path/to/yml --dataset /path/to/dataset --cuda --train --save_dir /path/to/save/dir
 ```
 
-Hyperparameters can be changed in CycleGan.yml using an text editor.
+Hyperparameters can be changed in CycleGan.yml using any text editor.
 
 To finetune on a pretrained checkpoint, set the 'pretrain' command as shown below
 
@@ -82,6 +82,5 @@ python train.py --yml /path/to/yml --dataset /path/to/dataset --cuda --train --s
 ## TODO
 
 1. Add inference script
-2. Add support for different datasets
 
 
