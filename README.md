@@ -43,7 +43,29 @@ conda install pytorch torchvision torchaudio cudatoolkit=10.2 -c pytorch
 
 ## Usage
 
-Currently, only training with one dataset is possible with this repository. An example training command is shown below
+Datasets for training can be downloaded using the script download.sh in model/data.
+
+Supported datasets can be found at this link https://people.eecs.berkeley.edu/~taesung_park/CycleGAN/datasets/. These datasets include:
+
+- apple2orange
+- cezanne2photo
+- facades
+- horse2zebra
+- iphone2dslr_flower
+- maps
+- monet2photo
+- summer2winter_yosemite
+- ukiyoe2photo
+- vangogh2photo
+
+An example command is 
+
+```
+cd model/data
+./download.sh horse2zebra
+```
+
+Currently, only training is possible with this repository. An example training command is shown below
 
 ```
 python train.py --yml /path/to/yml --dataset /path/to/dataset --cuda --train --save_dir /path/to/save/dir
